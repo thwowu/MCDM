@@ -10,4 +10,5 @@ by two optimization algorithms:
 - binary linear programming
 - evolutionary algorithms
 
-
+Update:
+(10-23) optimization algorithm

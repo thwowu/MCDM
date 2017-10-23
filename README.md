@@ -7,8 +7,8 @@ The source code for the thesis in investment evaluation, with mutliple criteria:
 - sysnergy assessment. 
 
 by two optimization algorithms: 
-- binary linear programming
-- evolutionary algorithms
+- binary linear programming (lpsolveAPI)
+- evolutionary algorithms (genalg)
 
 Update:
 (10-23) optimization algorithm

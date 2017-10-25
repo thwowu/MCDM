@@ -123,7 +123,8 @@ evalF <- function(x) {
 }	
 
 throwin = function(matrix, position, list){
-	for (kk in 1:length(list)) {
+	l = ncol(matrix)
+	for (kk in 1:l) {
 		matrix[position, kk] <- list[kk]
 	}
 	return (matrix)
@@ -170,10 +171,145 @@ grid <- function(range1, range2, range3, range4){
 	return(combination)
 }
 
-probbb <- function(data, combination, budget){	
+grid_para <- function(range1, range2, range3, range4){
+
+	output <- matrix(0, nrow = 2, ncol = 4)
+	
+	output[1,1] = range1[1]
+	output[1,2] = range2[1]
+	output[1,3] = range3[1]
+	output[1,4] = range4[1]
+	
+	output[2,1] = range1[2]
+	output[2,2] = range2[2]
+	output[2,3] = range3[2]
+	output[2,4] = range4[2]
+
+	colnames(output) = c("Return", "Probability", "feasibility", "synergy")
+	rownames(output) = c("Min", "Max")
+	return(output)
+}
+
+prob_LP <- function(data, combination, budget){	
 	projects <- nrow(data)
 	num_of_combi <- nrow(combination)
-	output <- matrix(0, nrow = num_of_combi * 2, ncol = projects + 2)
+	output <- matrix(0, nrow = num_of_combi, ncol = projects + 2 + 4)
+
+	for (number in 1:num_of_combi){
+		preference <- combination[number,]
+
+		prenorm <- pre_norm(combination[number,])
+		NameList <- data[ ,c("NormNPV","Probability", "feasibility","Synergy") ]
+		cof <- matrix(0, nrow = projects, ncol = 1)	
+
+		for (nn in 1:projects){
+			cof[nn,] <- as.numeric(NameList[nn,]) %*% t(prenorm)}
+		assign("coof", cof, envir = .GlobalEnv) 
+
+		LP_choice <- LP(data, budget)
+		cs1 <- c(LP_choice, t(round(prenorm, 2)),(LP_choice %*% data[, "CAPEX"]), (LP_choice %*% data[, "NPV"]))
+		output <- throwin(output, number, cs1)
+	}
+
+	colnames(output) <- c(as.character(data[,1]), "Return", "Probability", 
+						"feasibility", "synergy", "CAPEX", "NPV")
+
+	return(output)
+}
+
+
+prob_LP_latex <- function(data, combination, budget){	
+	projects <- nrow(data)
+	num_of_combi <- nrow(combination)
+	output <- matrix(0, nrow = num_of_combi, ncol = projects )
+
+	for (number in 1:num_of_combi){
+		preference <- combination[number,]
+
+		prenorm <- pre_norm(combination[number,])
+		NameList <- data[ ,c("NormNPV","Probability", "feasibility","Synergy") ]
+		cof <- matrix(0, nrow = projects, ncol = 1)	
+
+		for (nn in 1:projects){
+			cof[nn,] <- as.numeric(NameList[nn,]) %*% t(prenorm)}
+		assign("coof", cof, envir = .GlobalEnv) 
+
+		LP_choice <- LP(data, budget)
+		cs1 <- c(LP_choice)
+		output <- throwin(output, number, cs1)
+	}
+
+	nammm <- matrix(0, ncol = projects, nrow = 1)
+	for (k in 1: projects){
+		nammm[k] = paste("p", toString(k), sep = "")
+	}
+	colnames(output) <- c(as.character(nammm))
+
+	return(output)
+}
+
+
+prob_GA <- function(data, combination, budget){	
+	projects <- nrow(data)
+	num_of_combi <- nrow(combination)
+	output <- matrix(0, nrow = num_of_combi, ncol = projects + 2)
+
+	for (number in 1:num_of_combi){
+		preference <- combination[number,]
+		prenorm <- pre_norm(combination[number,])
+		NameList <- data[ ,c("NormNPV","Probability", "feasibility","Synergy") ]
+		cof <- matrix(0, nrow = projects, ncol = 1)	
+
+		for (nn in 1:projects){
+			cof[nn,] <- as.numeric(NameList[nn,]) %*% t(prenorm)}
+		assign("coof", cof, envir = .GlobalEnv) 
+
+		GA_choice <- genalg(data, projects, 0.01, budget)
+		cs2 <- c(GA_choice, (GA_choice %*% data[, "CAPEX"]), (GA_choice %*% data[, "NPV"]))
+		output <- throwin(output, number, cs2)
+	}
+
+	colnames(output) <- c(as.character(data[,1]), "CAPEX", "NPV")
+	return(output)
+}
+
+
+
+prob_GA_latex <- function(data, combination, budget){	
+	projects <- nrow(data)
+	num_of_combi <- nrow(combination)
+	output <- matrix(0, nrow = num_of_combi, ncol = projects + 2)
+
+	for (number in 1:num_of_combi){
+		preference <- combination[number,]
+		prenorm <- pre_norm(combination[number,])
+		NameList <- data[ ,c("NormNPV","Probability", "feasibility","Synergy") ]
+		cof <- matrix(0, nrow = projects, ncol = 1)	
+
+		for (nn in 1:projects){
+			cof[nn,] <- as.numeric(NameList[nn,]) %*% t(prenorm)}
+		assign("coof", cof, envir = .GlobalEnv) 
+
+		GA_choice <- genalg(data, projects, 0.01, budget)
+		cs2 <- c(GA_choice)
+		output <- throwin(output, number, cs2)
+	}
+
+
+	nammm <- matrix(0, ncol = projects, nrow = 1)
+	for (k in 1: projects){
+		nammm[k] = paste("p", toString(k), sep = "")
+	}
+	colnames(output) <- c(as.character(nammm))
+
+	return(output)
+}
+
+
+prob_both <- function(data, combination, budget){	
+	projects <- nrow(data)
+	num_of_combi <- nrow(combination)
+	output <- matrix(0, nrow = num_of_combi * 2, ncol = projects + 2 + 4)
 
 	for (number in 1:num_of_combi){
 		posi2 <- number * 2
@@ -182,9 +318,9 @@ probbb <- function(data, combination, budget){
 
 		prenorm <- pre_norm(combination[number,])
 		NameList <- data[ ,c("NormNPV","Probability", "feasibility","Synergy") ]
-		cof <- matrix(0, nrow = ncol, ncol = 1)	
+		cof <- matrix(0, nrow = projects, ncol = 1)	
 
-		for (nn in 1:ncol){
+		for (nn in 1:projects){
 			cof[nn,] <- as.numeric(NameList[nn,]) %*% t(prenorm)}
 		assign("coof", cof, envir = .GlobalEnv) 
 
@@ -212,12 +348,35 @@ probsit <- function(data, matrix){
 	prcob <- matrix(0, nrow = projects, ncol = 2)
 
 	for (hh in 1:projects){
-		prcob[hh,1] <- sum(matrix[,hh]) / (roww) * 100
-		prcob[hh,2] <- 100 - prcob[hh,1]
+		prcob[hh,1] <- paste(toString(round((sum(matrix[,hh])/(roww)*100),0)), 
+			                  "%", sep = "")
+		prcob[hh,2] <- paste(toString(round( (100 -(sum(matrix[,hh])/(roww)*100)), 0)), 
+			                  "%", sep = "")
 	}
 
 	rownames(prcob) <- data[,1]
-	colnames(prcob) <- c("inv", "not inv")
+	colnames(prcob) <- c("Possibility to be invested", "Not inv")
+
+	return(prcob)
+}
+
+
+probsit_latex <- function(data, matrix){
+	projects <- nrow(data)
+	roww <- nrow(matrix)
+	prcob <- matrix(0, nrow = projects, ncol = 2)
+
+	for (hh in 1:projects){
+		prcob[hh,1] <- round((sum(matrix[,hh])/(roww)), 2) 
+		prcob[hh,2] <- round(1 - (sum(matrix[,hh])/(roww)), 2) 
+	}
+
+	nammm <- matrix(0, ncol = 1, nrow = projects)
+	for (k in 1: projects){
+		nammm[k] = paste("p", toString(k), sep = "")
+	}
+	rownames(prcob) <- c(as.character(nammm))
+	colnames(prcob) <- c("Possibility to be invested", "not inv")
 
 	return(prcob)
 }
@@ -226,37 +385,130 @@ probsit <- function(data, matrix){
 budgd <- 10000
 
 # preference
-range1 <- c(8, 10) # [MIN, MAX] for NPV importance
-range2 <- c(0, 1) # [MIN, MAX] for probability importance
-range3 <- c(1, 2) # [MIN, MAX] for feasibility importance
-range4 <- c(1, 1) # [MIN, MAX] for synergy importance
+range1 <- c(5, 10) # [MIN, MAX] for NPV importance
+range2 <- c(1, 2) # [MIN, MAX] for probability importance
+range3 <- c(1, 5) # [MIN, MAX] for feasibility importance
+range4 <- c(1, 5) # [MIN, MAX] for synergy importance
 
 combination <- grid(range1, range2, range3, range4)
 
-listss <- probbb(dat, combination, budgd)
-probsit(dat, listss)
- 
+lpS <- prob_LP(dat, combination, budgd)
+GAA <- prob_GA(dat, combination, budgd)
+listss <- prob_both(dat, combination, budgd)
 
-probsit_latex <- function(data, matrix){
-	projects <- nrow(data)
-	roww <- nrow(matrix)
-	prcob <- matrix(0, nrow = projects, ncol = 5)
 
-	for (hh in 1:projects){
-		prcob[hh,1] <- "&"
-		prcob[hh,2] <- round((sum(matrix[,hh]) / (roww) * 100), 2)
-		prcob[hh,3] <- "&"
-		prcob[hh,4] <- 100 - round((sum(matrix[,hh]) / (roww) * 100), 2)
-		prcob[hh,5] <- "\\"
-	}
+numb <- lpS[, ncol(lpS)][which.max(lpS[, "NPV"])]
+sublist <- lpS[which(lpS[, "NPV"] == numb),]
+probsit(dat, sublist)
 
-	rownames(prcob) <- data[,1]
-	colnames(prcob) <- c("&", "inv", "&", "not inv", "\\")
 
-	return(prcob)
-}
+# linear programming (1)
 
-probsit_latex(dat, listss)
+# Start writing to an output file
+sink('analysis-output-lp2.txt')
+# preference
+range1 <- c(5, 10) # [MIN, MAX] for NPV importance
+range2 <- c(1, 2) # [MIN, MAX] for probability importance
+range3 <- c(1, 5) # [MIN, MAX] for feasibility importance
+range4 <- c(1, 5) # [MIN, MAX] for synergy importance
+combination <- grid(range1, range2, range3, range4)
+
+np <- nrow(dat)
+np2 <- nrow(combination) - 6
+cm <- prob_LP_latex(dat, combination, budgd)
+ln <- probsit_latex(dat, cm)
+
+# Do some stuff here
+cat("=================================================================\n")
+cat(sprintf("Bounds of Preference Score (from 0 to 10) for %d digital products\n", np))
+cat("=================================================================\n")
+print(grid_para(range1, range2, range3, range4))
+
+cat("\n\n======================================================\n")
+cat("Probability of digital product investment decision (%)\n")
+cat("======================================================\n")
+print(ln[,1]*100)
+cat(sprintf("(from %d results by criteria combinations)\n\n", np2+6))
+
+# Stop writing to the file
+sink()
+
+# Append to the file
+sink('analysis-output.txt', append=TRUE)
+sink()
+
+
+# Genetic (1)
+
+# Start writing to an output file
+sink('analysis-output-ga1.txt')
+range1 <- c(5, 10) # [MIN, MAX] for NPV importance
+range2 <- c(1, 2) # [MIN, MAX] for probability importance
+range3 <- c(1, 3) # [MIN, MAX] for feasibility importance
+range4 <- c(1, 3) # [MIN, MAX] for synergy importance
+combination <- grid(range1, range2, range3, range4)
+
+np <- nrow(dat)
+np2 <- nrow(combination) - 6
+cm <- prob_GA_latex(dat, combination, budgd)
+ln <- probsit_latex(dat, cm)
+
+# Do some stuff here
+cat("=================================================================\n")
+cat(sprintf("Bounds of Preference Score (from 0 to 10) for %d digital products\n", np))
+cat("=================================================================\n")
+print(grid_para(range1, range2, range3, range4))
+
+cat("\n\n======================================================\n")
+cat("Probability of digital product investment decision (%)\n")
+cat("======================================================\n")
+print(ln[,1]*100)
+cat(sprintf("(from %d results by criteria combinations)\n\n", np2+6))
+
+# Stop writing to the file
+sink()
+
+# Append to the file
+sink('analysis-output.txt', append=TRUE)
+sink()
+
+
+# Genetic (1)
+
+# Start writing to an output file
+sink('analysis-output-ga2.txt')
+range1 <- c(5, 10) # [MIN, MAX] for NPV importance
+range2 <- c(1, 2) # [MIN, MAX] for probability importance
+range3 <- c(1, 5) # [MIN, MAX] for feasibility importance
+range4 <- c(1, 5) # [MIN, MAX] for synergy importance
+combination <- grid(range1, range2, range3, range4)
+
+np <- nrow(dat)
+np2 <- nrow(combination) - 6
+cm <- prob_GA_latex(dat, combination, budgd)
+ln <- probsit_latex(dat, cm)
+
+# Do some stuff here
+cat("=================================================================\n")
+cat(sprintf("Bounds of Preference Score (from 0 to 10) for %d digital products\n", np))
+cat("=================================================================\n")
+print(grid_para(range1, range2, range3, range4))
+
+cat("\n\n======================================================\n")
+cat("Probability of digital product investment decision (%)\n")
+cat("======================================================\n")
+print(ln[,1]*100)
+cat(sprintf("(from %d results by criteria combinations)\n\n", np2+6))
+
+# Stop writing to the file
+sink()
+
+# Append to the file
+sink('analysis-output.txt', append=TRUE)
+sink()
+
+
+
 
 
 """
@@ -322,5 +574,23 @@ rownames(weight) <- c("%")
 colnames(weight) <- sd
 print(weight)
 
+probsit_latex <- function(data, matrix){
+	projects <- nrow(data)
+	roww <- nrow(matrix)
+	prcob <- matrix(0, nrow = projects, ncol = 5)
 
+	for (hh in 1:projects){
+		prcob[hh,1] <- "&"
+		prcob[hh,2] <- round((sum(matrix[,hh]) / (roww) * 100), 2)
+		prcob[hh,3] <- "&"
+		prcob[hh,4] <- 100 - round((sum(matrix[,hh]) / (roww) * 100), 2)
+		prcob[hh,5] <- "\\"
+	}
+
+	rownames(prcob) <- data[,1]
+	colnames(prcob) <- c("&", "inv", "&", "not inv", "\\")
+
+	return(prcob)
+}
+probsit_latex(dat, listss)
 """

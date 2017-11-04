@@ -1,35 +1,57 @@
-# linear programming (2)
+# probability to 0
 
 # Start writing to an output file
-sink('analysis-output-lpcompare.txt')
+sink('analysis-1or0-lp.txt')
+
+# basic input 
+budgd <- 10000
+
 # preference
 range1 <- c(5, 10) # [MIN, MAX] for NPV importance
-range2 <- c(1, 1) # [MIN, MAX] for probability importance
+range2 <- c(0, 0) # [MIN, MAX] for probability importance
 range3 <- c(1, 3) # [MIN, MAX] for feasibility importance
 range4 <- c(1, 3) # [MIN, MAX] for synergy importance
 combination <- grid(range1, range2, range3, range4)
 
 np <- nrow(dat)
-np2 <- nrow(combination) - 6
-cm <- prob_LP_compare(dat, combination, budgd)
-ln <- probsit_latex(dat, cm)
+cm <- prob_LP(dat, combination, budgd)
+
+comb1 <- nrow(combination)
+ln1 <- probsit_latex(dat, cm)
+bes1 <- best(dat, cm)
+
+
+range1 <- c(5, 10) # [MIN, MAX] for NPV importance
+range2 <- c(0, 0) # [MIN, MAX] for probability importance
+range3 <- c(1, 5) # [MIN, MAX] for feasibility importance
+range4 <- c(1, 5) # [MIN, MAX] for synergy importance
+combination <- grid(range1, range2, range3, range4)
+
+np <- nrow(dat)
+cm <- prob_LP(dat, combination, budgd)
+
+comb2 <- nrow(combination)
+ln2 <- probsit_latex(dat, cm)
+bes2 <- best(dat, cm)
 
 # Do some stuff here
-cat("=================================================================\n")
-cat(sprintf("Bounds of Preference Score (from 0 to 10) for %d digital products\n", np))
-cat("=================================================================\n")
-print(grid_para(range1, range2, range3, range4))
-
-cat("\n\n======================================================\n")
-cat(" Digital product investment suggestion by combination \n")
 cat("======================================================\n")
-print(cm[,1:(ncol(cm)-2)])
+cat("Optimal investment decision with ROI                  \n")
+cat("======================================================\n")
+cat("scenario 1: ")
+cat(trim(toString( noquote(bes1))))
+cat("\nscenario 2: ")
+cat(trim(toString( noquote(bes2))))
+
 
 cat("\n\n======================================================\n")
 cat("Probability of digital product investment decision (%)\n")
 cat("======================================================\n")
-print(ln[,1]*100)
-cat(sprintf("(from %d results by criteria combinations)\n\n", np2+6))
+print(ln1[,1]*100)
+cat(sprintf("(scenario 1 from %d results by criteria combinations)\n\n", comb1))
+print(ln2[,1]*100)
+cat(sprintf("(scenario 2 from %d results by criteria combinations)\n\n", comb2))
+
 
 # Stop writing to the file
 sink()
@@ -39,67 +61,356 @@ sink('analysis-output.txt', append=TRUE)
 sink()
 
 
-# Genetic algorithm (2)
+# Start writing to an output file
+sink('analysis-1or0-ga.txt')
+# preference
+range1 <- c(5, 10) # [MIN, MAX] for NPV importance
+range2 <- c(0, 0) # [MIN, MAX] for probability importance
+range3 <- c(1, 3) # [MIN, MAX] for feasibility importance
+range4 <- c(1, 3) # [MIN, MAX] for synergy importance
+combination <- grid(range1, range2, range3, range4)
+
+np <- nrow(dat)
+cm <- prob_GA(dat, combination, budgd)
+
+comb1 <- nrow(combination)
+ln1 <- probsit_latex(dat, cm)
+bes1 <- best(dat, cm)
+
+
+range1 <- c(5, 10) # [MIN, MAX] for NPV importance
+range2 <- c(0, 0) # [MIN, MAX] for probability importance
+range3 <- c(1, 5) # [MIN, MAX] for feasibility importance
+range4 <- c(1, 5) # [MIN, MAX] for synergy importance
+combination <- grid(range1, range2, range3, range4)
+
+np <- nrow(dat)
+cm <- prob_GA(dat, combination, budgd)
+
+comb2 <- nrow(combination)
+ln2 <- probsit_latex(dat, cm)
+bes2 <- best(dat, cm)
+
+# Do some stuff here
+cat("======================================================\n")
+cat("Optimal investment decision with ROI                  \n")
+cat("======================================================\n")
+cat("scenario 1: ")
+cat(trim(toString( noquote(bes1))))
+cat("\nscenario 2: ")
+cat(trim(toString( noquote(bes2))))
+
+
+cat("\n\n======================================================\n")
+cat("Probability of digital product investment decision (%)\n")
+cat("======================================================\n")
+print(ln1[,1]*100)
+cat(sprintf("(scenario 1 from %d results by criteria combinations)\n\n", comb1))
+print(ln2[,1]*100)
+cat(sprintf("(scenario 2 from %d results by criteria combinations)\n\n", comb2))
+
+
+# Stop writing to the file
+sink()
+
+# Append to the file
+sink('analysis-output.txt', append=TRUE)
+sink()
+
+
+
+# feasibility to 0
 
 # Start writing to an output file
-sink('analysis-output-ga1.txt')
+sink('analysis-1or0f-lp.txt')
+# preference
+ptm <- proc.time()
 range1 <- c(5, 10) # [MIN, MAX] for NPV importance
+range2 <- c(1, 2) # [MIN, MAX] for probability importance
+range3 <- c(0, 0) # [MIN, MAX] for feasibility importance
+range4 <- c(1, 3) # [MIN, MAX] for synergy importance
+combination <- grid(range1, range2, range3, range4)
+
+np <- nrow(dat)
+cm <- prob_LP(dat, combination, budgd)
+
+comb1 <- nrow(combination)
+ln1 <- probsit_latex(dat, cm)
+bes1 <- best(dat, cm)
+
+
+range1 <- c(5, 10) # [MIN, MAX] for NPV importance
+range2 <- c(1, 2) # [MIN, MAX] for probability importance
+range3 <- c(0, 0) # [MIN, MAX] for feasibility importance
+range4 <- c(1, 5) # [MIN, MAX] for synergy importance
+combination <- grid(range1, range2, range3, range4)
+
+np <- nrow(dat)
+cm <- prob_LP(dat, combination, budgd)
+
+comb2 <- nrow(combination)
+ln2 <- probsit_latex(dat, cm)
+bes2 <- best(dat, cm)
+
+# Do some stuff here
+cat("======================================================\n")
+cat("Optimal investment decision with ROI                  \n") 
+cat("======================================================\n")
+cat("scenario 1: ")
+cat(trim(toString( noquote(bes1))))
+cat("\nscenario 2: ")
+cat(trim(toString( noquote(bes2))))
+
+
+cat("\n\n======================================================\n")
+cat("Probability of digital product investment decision (%)\n")
+cat("======================================================\n")
+print(ln1[,1]*100)
+cat(sprintf("(scenario 1 from %d results by criteria combinations)\n\n", comb1))
+print(ln2[,1]*100)
+cat(sprintf("(scenario 2 from %d results by criteria combinations)\n\n", comb2))
+
+
+# Stop writing to the file
+sink()
+
+# Append to the file
+sink('analysis-output.txt', append=TRUE)
+sink()
+
+
+# Start writing to an output file
+sink('analysis-1or0f-ga.txt')
+# preference
+range1 <- c(5, 10) # [MIN, MAX] for NPV importance
+range2 <- c(1, 2) # [MIN, MAX] for probability importance
+range3 <- c(0, 0) # [MIN, MAX] for feasibility importance
+range4 <- c(1, 3) # [MIN, MAX] for synergy importance
+combination <- grid(range1, range2, range3, range4)
+
+np <- nrow(dat)
+cm <- prob_GA(dat, combination, budgd)
+
+comb1 <- nrow(combination)
+ln1 <- probsit_latex(dat, cm)
+bes1 <- best(dat, cm)
+
+
+range1 <- c(5, 10) # [MIN, MAX] for NPV importance
+range2 <- c(1, 2) # [MIN, MAX] for probability importance
+range3 <- c(0, 0) # [MIN, MAX] for feasibility importance
+range4 <- c(1, 5) # [MIN, MAX] for synergy importance
+combination <- grid(range1, range2, range3, range4)
+
+np <- nrow(dat)
+cm <- prob_GA(dat, combination, budgd)
+
+comb2 <- nrow(combination)
+ln2 <- probsit_latex(dat, cm)
+bes2 <- best(dat, cm)
+
+# Do some stuff here
+cat("======================================================\n")
+cat("Optimal investment decision with ROI                  \n")
+cat("======================================================\n")
+cat("scenario 1: ")
+cat(trim(toString( noquote(bes1))))
+cat("\nscenario 2: ")
+cat(trim(toString( noquote(bes2))))
+
+
+cat("\n\n======================================================\n")
+cat("Probability of digital product investment decision (%)\n")
+cat("======================================================\n")
+print(ln1[,1]*100)
+cat(sprintf("(scenario 1 from %d results by criteria combinations)\n\n", comb1))
+print(ln2[,1]*100)
+cat(sprintf("(scenario 2 from %d results by criteria combinations)\n\n", comb2))
+
+
+# Stop writing to the file
+sink()
+
+# Append to the file
+sink('analysis-output.txt', append=TRUE)
+sink()
+
+
+
+
+
+
+# synergy to 0
+
+# Start writing to an output file
+sink('analysis-1or0s-lp.txt')
+# preference
+range1 <- c(5, 10) # [MIN, MAX] for NPV importance
+range2 <- c(1, 2) # [MIN, MAX] for probability importance
+range3 <- c(1, 3) # [MIN, MAX] for feasibility importance
+range4 <- c(0, 0) # [MIN, MAX] for synergy importance
+combination <- grid(range1, range2, range3, range4)
+
+np <- nrow(dat)
+cm <- prob_LP(dat, combination, budgd)
+
+comb1 <- nrow(combination)
+ln1 <- probsit_latex(dat, cm)
+bes1 <- best(dat, cm)
+
+
+range1 <- c(5, 10) # [MIN, MAX] for NPV importance
+range2 <- c(1, 2) # [MIN, MAX] for probability importance
+range3 <- c(1, 5) # [MIN, MAX] for feasibility importance
+range4 <- c(0, 0) # [MIN, MAX] for synergy importance
+combination <- grid(range1, range2, range3, range4)
+
+np <- nrow(dat)
+cm <- prob_LP(dat, combination, budgd)
+
+comb2 <- nrow(combination)
+ln2 <- probsit_latex(dat, cm)
+bes2 <- best(dat, cm)
+
+# Do some stuff here
+cat("======================================================\n")
+cat("Optimal investment decision with ROI                  \n")
+cat("======================================================\n")
+cat("scenario 1: ")
+cat(trim(toString( noquote(bes1))))
+cat("\nscenario 2: ")
+cat(trim(toString( noquote(bes2))))
+
+
+cat("\n\n======================================================\n")
+cat("Probability of digital product investment decision (%)\n")
+cat("======================================================\n")
+print(ln1[,1]*100)
+cat(sprintf("(scenario 1 from %d results by criteria combinations)\n\n", comb1))
+print(ln2[,1]*100)
+cat(sprintf("(scenario 2 from %d results by criteria combinations)\n\n", comb2))
+
+
+# Stop writing to the file
+sink()
+
+# Append to the file
+sink('analysis-output.txt', append=TRUE)
+sink()
+
+
+# Start writing to an output file
+sink('analysis-1or0s-ga.txt')
+# preference
+range1 <- c(5, 10) # [MIN, MAX] for NPV importance
+range2 <- c(1, 2) # [MIN, MAX] for probability importance
+range3 <- c(1, 3) # [MIN, MAX] for feasibility importance
+range4 <- c(0, 0) # [MIN, MAX] for synergy importance
+combination <- grid(range1, range2, range3, range4)
+
+np <- nrow(dat)
+cm <- prob_GA(dat, combination, budgd)
+
+comb1 <- nrow(combination)
+ln1 <- probsit_latex(dat, cm)
+bes1 <- best(dat, cm)
+
+
+range1 <- c(5, 10) # [MIN, MAX] for NPV importance
+range2 <- c(1, 2) # [MIN, MAX] for probability importance
+range3 <- c(1, 5) # [MIN, MAX] for feasibility importance
+range4 <- c(0, 0) # [MIN, MAX] for synergy importance
+combination <- grid(range1, range2, range3, range4)
+
+np <- nrow(dat)
+cm <- prob_GA(dat, combination, budgd)
+
+comb2 <- nrow(combination)
+ln2 <- probsit_latex(dat, cm)
+bes2 <- best(dat, cm)
+
+# Do some stuff here
+cat("======================================================\n")
+cat("Optimal investment decision with ROI                  \n")
+cat("======================================================\n")
+cat("scenario 1: ")
+cat(trim(toString( noquote(bes1))))
+cat("\nscenario 2: ")
+cat(trim(toString( noquote(bes2))))
+
+
+cat("\n\n======================================================\n")
+cat("Probability of digital product investment decision (%)\n")
+cat("======================================================\n")
+print(ln1[,1]*100)
+cat(sprintf("(scenario 1 from %d results by criteria combinations)\n\n", comb1))
+print(ln2[,1]*100)
+cat(sprintf("(scenario 2 from %d results by criteria combinations)\n\n", comb2))
+
+
+# Stop writing to the file
+sink()
+
+# Append to the file
+sink('analysis-output.txt', append=TRUE)
+sink()
+
+
+
+
+# return to 0
+
+
+# Start writing to an output file
+sink('analysis-1or0r-lp.txt')
+
+
+# preference
+range1 <- c(0, 0) # [MIN, MAX] for NPV importance
 range2 <- c(1, 2) # [MIN, MAX] for probability importance
 range3 <- c(1, 3) # [MIN, MAX] for feasibility importance
 range4 <- c(1, 3) # [MIN, MAX] for synergy importance
 combination <- grid(range1, range2, range3, range4)
 
 np <- nrow(dat)
-np2 <- nrow(combination) - 6
-cm <- prob_GA_latex(dat, combination, budgd)
-ln <- probsit_latex(dat, cm)
+cm <- prob_LP(dat, combination, budgd)
 
-# Do some stuff here
-cat("=================================================================\n")
-cat(sprintf("Bounds of Preference Score (from 0 to 10) for %d digital products\n", np))
-cat("=================================================================\n")
-print(grid_para(range1, range2, range3, range4))
-
-cat("\n\n======================================================\n")
-cat("Probability of digital product investment decision (%)\n")
-cat("======================================================\n")
-print(ln[,1]*100)
-cat(sprintf("(from %d results by criteria combinations)\n\n", np2+6))
-
-# Stop writing to the file
-sink()
-
-# Append to the file
-sink('analysis-output.txt', append=TRUE)
-sink()
+comb1 <- nrow(combination)
+ln1 <- probsit_latex(dat, cm)
+bes1 <- best(dat, cm)
 
 
-# Genetic (1)
-
-# Start writing to an output file
-sink('analysis-output-ga2.txt')
-range1 <- c(5, 10) # [MIN, MAX] for NPV importance
+range1 <- c(0, 0) # [MIN, MAX] for NPV importance
 range2 <- c(1, 2) # [MIN, MAX] for probability importance
 range3 <- c(1, 5) # [MIN, MAX] for feasibility importance
 range4 <- c(1, 5) # [MIN, MAX] for synergy importance
 combination <- grid(range1, range2, range3, range4)
 
 np <- nrow(dat)
-np2 <- nrow(combination) - 6
-cm <- prob_GA_latex(dat, combination, budgd)
-ln <- probsit_latex(dat, cm)
+cm <- prob_LP(dat, combination, budgd)
+
+comb2 <- nrow(combination)
+ln2 <- probsit_latex(dat, cm)
+bes2 <- best(dat, cm)
 
 # Do some stuff here
-cat("=================================================================\n")
-cat(sprintf("Bounds of Preference Score (from 0 to 10) for %d digital products\n", np))
-cat("=================================================================\n")
-print(grid_para(range1, range2, range3, range4))
+cat("======================================================\n")
+cat("Optimal investment decision with ROI                  \n")
+cat("======================================================\n")
+cat("scenario 1: ")
+cat(trim(toString( noquote(bes1))))
+cat("\nscenario 2: ")
+cat(trim(toString( noquote(bes2))))
+
 
 cat("\n\n======================================================\n")
-cat("Probability of digital product investment suggestion (%)\n")
+cat("Probability of digital product investment decision (%)\n")
 cat("======================================================\n")
-print(ln[,1]*100)
-cat(sprintf("(from %d results by criteria combinations)\n\n", np2+6))
+print(ln1[,1]*100)
+cat(sprintf("(scenario 1 from %d results by criteria combinations)\n\n", comb1))
+print(ln2[,1]*100)
+cat(sprintf("(scenario 2 from %d results by criteria combinations)\n\n", comb2))
+
 
 # Stop writing to the file
 sink()
@@ -109,36 +420,53 @@ sink('analysis-output.txt', append=TRUE)
 sink()
 
 
-
-# Hybrid (1)
-
 # Start writing to an output file
+sink('analysis-1or0r-ga.txt')
+# preference
+range1 <- c(0, 0) # [MIN, MAX] for NPV importance
+range2 <- c(1, 2) # [MIN, MAX] for probability importance
+range3 <- c(1, 3) # [MIN, MAX] for feasibility importance
+range4 <- c(1, 3) # [MIN, MAX] for synergy importance
+combination <- grid(range1, range2, range3, range4)
 
-sink('analysis-output-hybrid2.txt')
+np <- nrow(dat)
+cm <- prob_GA(dat, combination, budgd)
 
-budgd <- 10000
-range1 <- c(5, 10) # [MIN, MAX] for NPV importance
+comb1 <- nrow(combination)
+ln1 <- probsit_latex(dat, cm)
+bes1 <- best(dat, cm)
+
+range1 <- c(0, 0) # [MIN, MAX] for NPV importance
 range2 <- c(1, 2) # [MIN, MAX] for probability importance
 range3 <- c(1, 5) # [MIN, MAX] for feasibility importance
 range4 <- c(1, 5) # [MIN, MAX] for synergy importance
 combination <- grid(range1, range2, range3, range4)
 
 np <- nrow(dat)
-np2 <- nrow(combination)
-cm <- prob_both_latex(dat, combination, budgd)
-ln <- probsit_latex(dat, cm)
+cm <- prob_GA(dat, combination, budgd)
+
+comb2 <- nrow(combination)
+ln2 <- probsit_latex(dat, cm)
+bes2 <- best(dat, cm)
 
 # Do some stuff here
-cat("=================================================================\n")
-cat(sprintf("Bounds of Preference Score (from 0 to 10) for %d digital products\n", np))
-cat("=================================================================\n")
-print(grid_para(range1, range2, range3, range4))
+cat("======================================================\n")
+cat("Optimal investment decision with ROI                  \n")
+cat("======================================================\n")
+cat("scenario 1: ")
+cat(trim(toString( noquote(bes1))))
+cat("\nscenario 2: ")
+cat(trim(toString( noquote(bes2))))
+
 
 cat("\n\n======================================================\n")
 cat("Probability of digital product investment decision (%)\n")
 cat("======================================================\n")
-print(ln[,1]*100)
-cat(sprintf("(from %d results by criteria combinations)\n\n", np2))
+print(ln1[,1]*100)
+cat(sprintf("(scenario 1 from %d results by criteria combinations)\n\n", comb1))
+print(ln2[,1]*100)
+cat(sprintf("(scenario 2 from %d results by criteria combinations)\n\n", comb2))
+
 
 # Stop writing to the file
 sink()
@@ -146,5 +474,3 @@ sink()
 # Append to the file
 sink('analysis-output.txt', append=TRUE)
 sink()
-
-

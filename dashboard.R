@@ -14,6 +14,7 @@ dat[, 1] <- lapply(dat[1], as.character)
 dat[, 2] <- lapply(dat[2], as.character)
 dat[, 3]    <- lapply(dat[3], as.character)
 dat[, 4]  <- lapply(dat[4], as.character)
+dat[, 5] <- as.numeric(dat[, 5])
 
 dat <- na.omit(dat)
 

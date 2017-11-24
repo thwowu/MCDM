@@ -160,3 +160,4 @@ for (loo in 1:lenP(Measure)){
   textbox(x = c(6 - text_box_border, 6 + text_box_border), y = Measure$y_cord[loo] + ratio * 0.2 * sum(Measure$Budget)/length(Measure) , 
     textlist = Measure$Product[loo], justify = 'c', cex=0.5, box=FALSE)
 }
+
